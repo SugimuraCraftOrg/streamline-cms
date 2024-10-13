@@ -1,7 +1,7 @@
 /* The databases for local development. */
 
 -- create user.
-CREATE USER dbuser WITH PASSWORD 'dbpassword';
+CREATE USER dbuser WITH PASSWORD dbpassword;
 
 /* The database for development. */
 

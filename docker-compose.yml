@@ -8,8 +8,8 @@ services:
       - "./docker/db/data:/var/lib/postgresql/data"
       - "./docker/db/initdb.d:/docker-entrypoint-initdb.d"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: superpassword
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     deploy:
       resources:
         limits:

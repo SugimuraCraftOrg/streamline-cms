@@ -10,6 +10,14 @@ The simple and intuitive headless CMS.
 
 ## Local Setup
 
+Create .env file like .env.template.
+
+```bash
+cp .env.template .env
+```
+
+And run docker containers.
+
 ```bash
 docker compose up -d
 ```

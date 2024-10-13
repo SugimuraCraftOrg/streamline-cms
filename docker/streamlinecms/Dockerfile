@@ -17,12 +17,12 @@ RUN apt install -y postgresql-client \
 # - python
 RUN mkdir -p /opt/streamlinecms
 COPY .env /opt/streamlinecms/.env
-COPY ./back/requirements.lock /opt/streamlinecms/requirements.lock
-# COPY ./streamlinecms/requirements.txt /opt/streamlinecms/requirements.txt
 WORKDIR /opt/streamlinecms
-RUN pip install -r requirements.txt \
+COPY ./streamlinecms/requirements.lock /opt/streamlinecms/requirements.lock
+RUN pip install -r requirements.lock \
     && rm -rf ~/.cache/pip
-# Migrate DB
-RUN alembic upgrade head
+# COPY ./streamlinecms/requirements.txt /opt/streamlinecms/requirements.txt
+# RUN pip install -r requirements.txt \
+#     && rm -rf ~/.cache/pip
 # - startup
 # CMD python

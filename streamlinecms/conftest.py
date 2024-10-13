@@ -1,7 +1,7 @@
 from os import getenv
 from pytest import fixture
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import close_all_sessions, sessionmaker, scoped_session
 
@@ -48,6 +48,8 @@ def session(set_project_test_true):
             db.commit()
         except SQLAlchemyError as e:
             assert e is not None
+            pass
+        finally:
             db.rollback()
 
     app.dependency_overrides["get_db"] = get_db_for_testing

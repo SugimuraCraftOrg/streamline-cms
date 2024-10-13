@@ -1,11 +1,11 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from functools import lru_cache
 from typing import Dict
+from zoneinfo import ZoneInfo
 
 from pydantic_settings import BaseSettings
 
 
-@lru_cache()
 class ProjectSettings(BaseSettings):
     """Load project settings from environ."""
 
@@ -17,18 +17,27 @@ class ProjectSettings(BaseSettings):
 
 
 @lru_cache()
+def get_project_settings():
+    return ProjectSettings()
+
+
 class AppSettings(BaseSettings):
     """Load app settings from environ."""
 
     secret_key: str
     token_expire_hours: int
-    timezone_offset: int
+    timezone_name: str
+    cors_origins: list
 
     class Config:
         env_prefix = "app_"
 
 
 @lru_cache()
+def get_app_settings():
+    return AppSettings()
+
+
 class DBSettings(BaseSettings):
     """Load DB settings from environ."""
 
@@ -40,17 +49,15 @@ class DBSettings(BaseSettings):
 
     @property
     def database_uri(self):
-        project_settings = ProjectSettings()
+        project_settings = get_project_settings()
         if project_settings.test:
             return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}_test"
         return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
 
     @property
     def echo(self):
-        project_settings = ProjectSettings()
-        if project_settings.env == "prod":
-            return False
-        return True
+        project_settings = get_project_settings()
+        return project_settings.env != "prod"
 
     @property
     def engine_info(self) -> Dict:
@@ -64,13 +71,18 @@ class DBSettings(BaseSettings):
         env_prefix = "db_"
 
 
+@lru_cache()
+def get_db_settings():
+    return DBSettings()
+
+
 def utc_timezone():
-    return timezone(timedelta(hours=0))
+    return ZoneInfo("UTC")
 
 
 def local_timezone():
     app_settings = AppSettings()
-    return timezone(timedelta(hours=app_settings.timezone_offset))
+    return ZoneInfo(app_settings.timezone_name)
 
 
 def utc_now():
