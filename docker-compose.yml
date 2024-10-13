@@ -1,0 +1,36 @@
+services:
+  db:
+    env_file: .env
+    build:
+      context: ./
+      dockerfile: ./docker/db/Dockerfile
+    volumes:
+      - "./docker/db/data:/var/lib/postgresql/data"
+      - "./docker/db/initdb.d:/docker-entrypoint-initdb.d"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    deploy:
+      resources:
+        limits:
+          memory: 1G  # limit memory.
+
+  streamlinecms:
+    depends_on:
+      - db
+    env_file:
+      - .env
+    build:
+      context: ./
+      dockerfile: ./docker/streamlinecms/Dockerfile
+    volumes:
+      - ./streamlinecms:/opt/streamlinecms
+      - ./docker/streamlinecms/data:/var/streamlinecms
+    ports:
+      - "18000:8000"
+    # command: sleep infinity
+    command: uvicorn main:app --workers 1 --reload --host 0.0.0.0 --port 8000
+    deploy:
+      resources:
+        limits:
+          memory: 1G  # limit memory.
